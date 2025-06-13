@@ -1,0 +1,37 @@
+name: Span Task Orchestrator
+on:
+  repository_dispatch:
+    types: [span-task]
+
+jobs:
+  execute-task:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Execute Claude Code Task
+        uses: anthropics/claude-code-base-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt_file: ".span/tasks/${{ github.event.client_payload.task_id }}.md"
+          allowed_tools: "Bash(git:*),Edit,View,GlobTool,GrepTool,Replace"
+          max_turns: "15"
+          claude_env: |
+            SPAN_TASK_ID: ${{ github.event.client_payload.task_id }}
+            SPAN_COMPONENT: ${{ github.event.client_payload.component }}
+            SPAN_PHASE: ${{ github.event.client_payload.phase }}
+            TASK_PRIORITY: ${{ github.event.client_payload.priority }}
+
+      - name: Report Task Completion
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `[Span] Task ${{ github.event.client_payload.task_id }} completed`,
+              body: `Task completed successfully. Check PR for implementation details.`,
+              labels: ['span-completed', '${{ github.event.client_payload.component }}']
+            });
