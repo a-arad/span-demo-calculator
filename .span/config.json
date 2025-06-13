@@ -1,0 +1,29 @@
+{
+  "orchestration": {
+    "auto_retry": true,
+    "default_model": "anthropic/claude-3.5-sonnet",
+    "max_parallel_tasks": 3
+  },
+  "project": {
+    "architecture": {
+      "backend": null,
+      "database": null,
+      "deployment": "Vercel",
+      "frontend": {
+        "framework": "React",
+        "language": "TypeScript",
+        "libraries": [
+          "Tailwind CSS",
+          "Vite"
+        ]
+      }
+    },
+    "description": "A simple calculator app built by span - AI-powered development orchestration demo",
+    "name": "span-demo-calculator"
+  },
+  "version": "1.0",
+  "workflows": {
+    "claude_workflow": ".github/workflows/claude.yml",
+    "span_orchestrator": ".github/workflows/span-orchestrator.yml"
+  }
+}
